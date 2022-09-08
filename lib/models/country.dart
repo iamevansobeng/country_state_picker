@@ -28,8 +28,10 @@ class Country {
     required this.emojiU,
   });
 
+  // FORMAT JSON TO DART OBJECT
   factory Country.fromJson(Map<String, dynamic> json) {
     var states = <State>[];
+    // ITERATE OVER JSON TO CREATE STATES FOR THE COUNTRY
     json["states"].forEach((st) => states.add(State.fromJson(st)));
     return Country(
       states: states,

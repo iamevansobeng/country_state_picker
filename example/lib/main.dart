@@ -1,5 +1,7 @@
-import 'package:country_state_picker/country_state_picker.dart';
 import 'package:flutter/material.dart';
+
+// IMPORT COUNTRY STATE PICKER
+import 'package:country_state_picker/country_state_picker.dart';
 
 void main() {
   runApp(const AddressPicker());
@@ -13,8 +15,8 @@ class AddressPicker extends StatefulWidget {
 }
 
 class _AddressPickerState extends State<AddressPicker> {
+  // DECLARE STATE VARIABLES
   String? state;
-
   String? country;
 
   @override
@@ -27,6 +29,7 @@ class _AddressPickerState extends State<AddressPicker> {
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Column(
               children: [
+                // IMPLEMENT WIDGET
                 CountryStatePicker(
                   onCountryChanged: (ct) => setState(() {
                     country = ct;

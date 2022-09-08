@@ -1,6 +1,6 @@
 name: country_state_picker
-description: A Package for Picking Countries and States.
-version: 0.0.3
+description: A Package for Picking Countries and States from a Dropdown Field. Compactible with IOS,ANDROID AND WEB. Feel free to make PR's and suggestions.
+version: 0.0.4
 homepage: https://github.com/iamevansobeng/country_state_picker
 repository: https://github.com/iamevansobeng/country_state_picker
 

@@ -31,7 +31,7 @@ This package provides drop-down items for selecting countries and states.
 
 1. Import the package
    ```
-   import 'package:country_state_picker/models/country.dart';
+   import 'package:country_state_picker/country_state_picker.dart';
    ```
 2. Provide at least the required params
 

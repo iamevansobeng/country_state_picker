@@ -115,6 +115,7 @@ class _CountryStatePickerState extends State<CountryStatePicker> {
   // POPULATE STATE WITH COUNTRIES
   Future fetchCountries() async {
     var res = await fetchFile() as List;
+    // ITERATE RESPONSET TO CREATE COUNTRIES AND STATES FOR EACH COUNTRY
     var data = res.map((ct) => Country.fromJson(ct)).toList();
 
     setState(() {
@@ -134,7 +135,10 @@ class _CountryStatePickerState extends State<CountryStatePicker> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        // LABEL FOR COUNTRY FIELD
         widget.countryLabel ?? const Label(title: "Country"),
+
+        // COUNTRY FIELD
         InputDecorator(
           decoration: widget.inputDecoration ?? _inputDecoration,
           child: DropdownButtonHideUnderline(
@@ -162,6 +166,7 @@ class _CountryStatePickerState extends State<CountryStatePicker> {
                 elevation: widget.elevation ?? 0,
                 isExpanded: widget.isExpanded ?? true,
                 items: [
+                  // CREARE LIST ITEMS FROM COUNTRIES DATA
                   ..._countries
                       .map(
                         (country) => DropdownMenuItem(
@@ -199,21 +204,18 @@ class _CountryStatePickerState extends State<CountryStatePicker> {
                   });
                   widget.onCountryChanged(ct.name);
                 }),
-            // onTap: widget.onCountryTap,
-            // onChanged: (value) => _onSelectedCountry(value!),
-            // value: _selectedCountry,
           ),
         ),
 
         /**
-         * DIVIDER
+         * DIVIDER TO SEPRATE THE TWO FIELDS
          */
         widget.divider ?? const SizedBox(height: 10),
 
-        /**
-         * STATE PICKER
-         */
+        // LAGE FOR STATE PICKER
         widget.stateLabel ?? const Label(title: "State"),
+
+        //STATE PICKER
         InputDecorator(
           decoration: widget.inputDecoration ?? _inputDecoration,
           child: DropdownButtonHideUnderline(
@@ -236,6 +238,7 @@ class _CountryStatePickerState extends State<CountryStatePicker> {
                 items: selectedCountry == null
                     ? []
                     : [
+                        // MAP STATES OF SELECTED COUNTRY
                         ...selectedCountry!.states
                             .map(
                               (state) => DropdownMenuItem(
