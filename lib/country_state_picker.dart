@@ -46,6 +46,7 @@ class CountryStatePicker extends StatefulWidget {
     this.elevation,
     this.isExpanded,
     this.divider,
+    this.inputDecoration,
   }) : super(key: key);
 
   final ValueChanged<String> onCountryChanged;
@@ -54,6 +55,7 @@ class CountryStatePicker extends StatefulWidget {
   final VoidCallback? onCountryTap;
   final VoidCallback? onStateTap;
 
+  final InputDecoration? inputDecoration;
   final double? flagSize;
   final double? listFlagSize;
   final TextStyle? hintTextStyle;
@@ -97,7 +99,7 @@ class _CountryStatePickerState extends State<CountryStatePicker> {
     return Column(
       children: [
         InputDecorator(
-          decoration: _inputDecoration,
+          decoration: widget.inputDecoration ?? _inputDecoration,
           child: DropdownButtonHideUnderline(
             child: DropdownButton<String>(
                 hint: selectedCountry != null
