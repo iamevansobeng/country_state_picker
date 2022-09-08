@@ -134,7 +134,7 @@ class _CountryStatePickerState extends State<CountryStatePicker> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const Label(title: "Country"),
+        widget.countryLabel ?? const Label(title: "Country"),
         InputDecorator(
           decoration: widget.inputDecoration ?? _inputDecoration,
           child: DropdownButtonHideUnderline(
@@ -213,6 +213,7 @@ class _CountryStatePickerState extends State<CountryStatePicker> {
         /**
          * STATE PICKER
          */
+        widget.stateLabel ?? const Label(title: "State"),
         InputDecorator(
           decoration: widget.inputDecoration ?? _inputDecoration,
           child: DropdownButtonHideUnderline(
