@@ -5,3 +5,7 @@
 ## 0.0.2
 
 - ADDED InputDecoration as Param
+
+## 0.0.3
+
+- ADDED COMMENTS AND COMPLETE DOCUMENTATION

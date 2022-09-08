@@ -6,6 +6,7 @@ import 'package:country_state_picker/models/country.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 
+/// DEFAULT INPUT DECORATION
 InputDecoration _inputDecoration = InputDecoration(
   prefixStyle: const TextStyle(color: Colors.blueGrey),
   focusColor: Colors.blueGrey,
@@ -21,7 +22,7 @@ InputDecoration _inputDecoration = InputDecoration(
     borderSide: BorderSide(color: Colors.redAccent, width: 1.5),
   ),
   filled: true,
-  contentPadding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
+  contentPadding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 20.0),
   fillColor: Colors.grey.shade200,
   enabledBorder: const OutlineInputBorder(
     borderSide: BorderSide(color: Colors.white, width: 2.0),
@@ -30,6 +31,29 @@ InputDecoration _inputDecoration = InputDecoration(
     borderSide: BorderSide(color: Colors.grey.withOpacity(0.6), width: 1.0),
   ),
 );
+
+// WIDGET FOR LABEL
+
+class Label extends StatelessWidget {
+  const Label({
+    Key? key,
+    required this.title,
+  }) : super(key: key);
+
+  final String title;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 3),
+      child: Text(
+        title,
+        style:
+            const TextStyle(fontWeight: FontWeight.w500, color: Colors.black54),
+      ),
+    );
+  }
+}
 
 class CountryStatePicker extends StatefulWidget {
   const CountryStatePicker({
@@ -47,6 +71,8 @@ class CountryStatePicker extends StatefulWidget {
     this.isExpanded,
     this.divider,
     this.inputDecoration,
+    this.countryLabel,
+    this.stateLabel,
   }) : super(key: key);
 
   final ValueChanged<String> onCountryChanged;
@@ -65,6 +91,8 @@ class CountryStatePicker extends StatefulWidget {
   final bool? isExpanded;
 
   final Widget? divider;
+  final Widget? countryLabel;
+  final Widget? stateLabel;
 
   @override
   State<CountryStatePicker> createState() => _CountryStatePickerState();
@@ -77,19 +105,26 @@ class _CountryStatePickerState extends State<CountryStatePicker> {
 
   String? state;
 
+  /// GET COUNTRY AND CITIES FROM JSON
   Future fetchFile() async {
     var res = await rootBundle.loadString(
         'packages/country_state_picker/lib/utils/country-state.json');
     return jsonDecode(res);
   }
 
+  // POPULATE STATE WITH COUNTRIES
   Future fetchCountries() async {
-    var data = await fetchFile() as List;
-    _countries = data.map((ct) => Country.fromJson(ct)).toList();
+    var res = await fetchFile() as List;
+    var data = res.map((ct) => Country.fromJson(ct)).toList();
+
+    setState(() {
+      _countries = data;
+    });
   }
 
   @override
   void initState() {
+    // MAKE SURE COUNTRIES ARE POPULATED BEFORE WIGET IS MOUNTED
     fetchCountries();
     super.initState();
   }
@@ -97,7 +132,9 @@ class _CountryStatePickerState extends State<CountryStatePicker> {
   @override
   Widget build(BuildContext context) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        const Label(title: "Country"),
         InputDecorator(
           decoration: widget.inputDecoration ?? _inputDecoration,
           child: DropdownButtonHideUnderline(
@@ -177,7 +214,7 @@ class _CountryStatePickerState extends State<CountryStatePicker> {
          * STATE PICKER
          */
         InputDecorator(
-          decoration: _inputDecoration,
+          decoration: widget.inputDecoration ?? _inputDecoration,
           child: DropdownButtonHideUnderline(
             child: DropdownButton<String>(
                 hint: state != null
