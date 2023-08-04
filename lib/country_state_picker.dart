@@ -161,7 +161,7 @@ class _CountryStatePickerState extends State<CountryStatePicker> {
                           ),
                         ],
                       )
-                    : const Text("Choose Country"),
+                    : setTextHint('Choose Country'),
                 dropdownColor: widget.dropdownColor ?? Colors.grey.shade100,
                 elevation: widget.elevation ?? 0,
                 isExpanded: widget.isExpanded ?? true,
@@ -231,7 +231,7 @@ class _CountryStatePickerState extends State<CountryStatePicker> {
                           ),
                         ],
                       )
-                    : const Text("Choose State"),
+                    : setTextHint('Choose State'),
                 dropdownColor: widget.dropdownColor ?? Colors.grey.shade100,
                 elevation: widget.elevation ?? 0,
                 isExpanded: widget.isExpanded ?? true,
@@ -274,4 +274,9 @@ class _CountryStatePickerState extends State<CountryStatePicker> {
       ],
     );
   }
+}
+
+// RETURN A TEXT WIDGET
+Widget setTextHint(String text) {
+  return Text(text);
 }
