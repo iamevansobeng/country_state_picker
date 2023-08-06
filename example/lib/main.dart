@@ -31,6 +31,8 @@ class _AddressPickerState extends State<AddressPicker> {
               children: [
                 // IMPLEMENT WIDGET
                 CountryStatePicker(
+                  countryLabel: const Label(title: "País"),
+                  stateLabel: const Label(title: "Estado"),
                   onCountryChanged: (ct) => setState(() {
                     country = ct;
                     state = null;
@@ -38,6 +40,10 @@ class _AddressPickerState extends State<AddressPicker> {
                   onStateChanged: (st) => setState(() {
                     state = st;
                   }),
+                  // A little Spanish hint
+                  countryHintText: "Elige País",
+                  stateHintText: "Elige Estado",
+                  noStateFoundText: "Ningún Estado",
                 ),
                 const SizedBox(height: 50),
                 if (country != null)
@@ -45,7 +51,7 @@ class _AddressPickerState extends State<AddressPicker> {
                       style: const TextStyle(fontSize: 18)),
                 const SizedBox(height: 40),
                 if (state != null)
-                  Text("Country = $state", style: const TextStyle(fontSize: 18))
+                  Text("State = $state", style: const TextStyle(fontSize: 18))
               ],
             ),
           ),

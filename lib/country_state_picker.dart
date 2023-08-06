@@ -73,6 +73,11 @@ class CountryStatePicker extends StatefulWidget {
     this.inputDecoration,
     this.countryLabel,
     this.stateLabel,
+    this.countryHintText,
+    this.stateHintText,
+    this.noStateFoundText,
+    this.countryHintStyle,
+    this.stateHintStyle,
   }) : super(key: key);
 
   final ValueChanged<String> onCountryChanged;
@@ -93,6 +98,13 @@ class CountryStatePicker extends StatefulWidget {
   final Widget? divider;
   final Widget? countryLabel;
   final Widget? stateLabel;
+
+  final String? countryHintText;
+  final String? stateHintText;
+  final String? noStateFoundText;
+
+  final TextStyle? countryHintStyle;
+  final TextStyle? stateHintStyle;
 
   @override
   State<CountryStatePicker> createState() => _CountryStatePickerState();
@@ -115,7 +127,7 @@ class _CountryStatePickerState extends State<CountryStatePicker> {
   // POPULATE STATE WITH COUNTRIES
   Future fetchCountries() async {
     var res = await fetchFile() as List;
-    // ITERATE RESPONSET TO CREATE COUNTRIES AND STATES FOR EACH COUNTRY
+    // ITERATE RESPONSE TO CREATE COUNTRIES AND STATES FOR EACH COUNTRY
     var data = res.map((ct) => Country.fromJson(ct)).toList();
 
     setState(() {
@@ -161,7 +173,10 @@ class _CountryStatePickerState extends State<CountryStatePicker> {
                           ),
                         ],
                       )
-                    : setTextHint('Choose Country'),
+                    : hintText(
+                        widget.countryHintText ?? 'Choose Country',
+                        style: widget.countryHintStyle,
+                      ),
                 dropdownColor: widget.dropdownColor ?? Colors.grey.shade100,
                 elevation: widget.elevation ?? 0,
                 isExpanded: widget.isExpanded ?? true,
@@ -216,6 +231,7 @@ class _CountryStatePickerState extends State<CountryStatePicker> {
         widget.stateLabel ?? const Label(title: "State"),
 
         //STATE PICKER
+
         InputDecorator(
           decoration: widget.inputDecoration ?? _inputDecoration,
           child: DropdownButtonHideUnderline(
@@ -231,7 +247,12 @@ class _CountryStatePickerState extends State<CountryStatePicker> {
                           ),
                         ],
                       )
-                    : setTextHint('Choose State'),
+                    : selectedCountry != null && selectedCountry!.states.isEmpty
+                        ? Text(widget.noStateFoundText ?? "No States Found")
+                        : hintText(
+                            widget.stateHintText ?? 'Choose State',
+                            style: widget.stateHintStyle,
+                          ),
                 dropdownColor: widget.dropdownColor ?? Colors.grey.shade100,
                 elevation: widget.elevation ?? 0,
                 isExpanded: widget.isExpanded ?? true,
@@ -277,6 +298,6 @@ class _CountryStatePickerState extends State<CountryStatePicker> {
 }
 
 // RETURN A TEXT WIDGET
-Widget setTextHint(String text) {
-  return Text(text);
+Text hintText(String text, {TextStyle? style}) {
+  return Text(text, style: style);
 }
