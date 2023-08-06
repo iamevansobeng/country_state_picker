@@ -1,3 +1,4 @@
+import 'package:country_state_picker/components/index.dart';
 import 'package:flutter/material.dart';
 
 // IMPORT COUNTRY STATE PICKER

@@ -6,54 +6,8 @@ import 'package:country_state_picker/models/country.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 
-/// DEFAULT INPUT DECORATION
-InputDecoration _inputDecoration = InputDecoration(
-  prefixStyle: const TextStyle(color: Colors.blueGrey),
-  focusColor: Colors.blueGrey,
-  iconColor: Colors.blueGrey,
-  prefixIconColor: Colors.blueGrey,
-  suffixIconColor: Colors.blueGrey,
-  suffixStyle: const TextStyle(color: Colors.blueGrey),
-  errorStyle: const TextStyle(color: Colors.redAccent),
-  errorBorder: const OutlineInputBorder(
-    borderSide: BorderSide(color: Colors.redAccent, width: 0.8),
-  ),
-  focusedErrorBorder: const OutlineInputBorder(
-    borderSide: BorderSide(color: Colors.redAccent, width: 1.5),
-  ),
-  filled: true,
-  contentPadding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 20.0),
-  fillColor: Colors.grey.shade200,
-  enabledBorder: const OutlineInputBorder(
-    borderSide: BorderSide(color: Colors.white, width: 2.0),
-  ),
-  focusedBorder: OutlineInputBorder(
-    borderSide: BorderSide(color: Colors.grey.withOpacity(0.6), width: 1.0),
-  ),
-);
-
-// WIDGET FOR LABEL
-
-class Label extends StatelessWidget {
-  const Label({
-    Key? key,
-    required this.title,
-  }) : super(key: key);
-
-  final String title;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 3),
-      child: Text(
-        title,
-        style:
-            const TextStyle(fontWeight: FontWeight.w500, color: Colors.black54),
-      ),
-    );
-  }
-}
+import 'components/index.dart';
+import 'utils/index.dart';
 
 class CountryStatePicker extends StatefulWidget {
   const CountryStatePicker({
@@ -76,12 +30,15 @@ class CountryStatePicker extends StatefulWidget {
     this.countryHintText,
     this.stateHintText,
     this.noStateFoundText,
-    this.countryHintStyle,
-    this.stateHintStyle,
+    this.stateValidator,
+    this.countryValidator,
   }) : super(key: key);
 
   final ValueChanged<String> onCountryChanged;
   final ValueChanged<String> onStateChanged;
+
+  final ValidatorFunction? countryValidator;
+  final ValidatorFunction? stateValidator;
 
   final VoidCallback? onCountryTap;
   final VoidCallback? onStateTap;
@@ -102,9 +59,6 @@ class CountryStatePicker extends StatefulWidget {
   final String? countryHintText;
   final String? stateHintText;
   final String? noStateFoundText;
-
-  final TextStyle? countryHintStyle;
-  final TextStyle? stateHintStyle;
 
   @override
   State<CountryStatePicker> createState() => _CountryStatePickerState();
@@ -151,76 +105,72 @@ class _CountryStatePickerState extends State<CountryStatePicker> {
         widget.countryLabel ?? const Label(title: "Country"),
 
         // COUNTRY FIELD
-        InputDecorator(
-          decoration: widget.inputDecoration ?? _inputDecoration,
-          child: DropdownButtonHideUnderline(
-            child: DropdownButton<String>(
-                hint: selectedCountry != null
-                    ? Row(
+        DropdownButtonFormField<String>(
+            validator: widget.countryValidator,
+            decoration: widget.inputDecoration ?? defaultInputDecoration,
+            hint: selectedCountry != null
+                ? Row(
+                    children: [
+                      Text(
+                        selectedCountry!.emoji,
+                        style: TextStyle(
+                          fontSize: widget.flagSize ?? 22,
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Text(
+                        selectedCountry!.name,
+                        style: widget.hintTextStyle ??
+                            const TextStyle(color: Colors.black, fontSize: 16),
+                      ),
+                    ],
+                  )
+                : hintText(
+                    widget.countryHintText ?? 'Choose Country',
+                    style: widget.hintTextStyle,
+                  ),
+            dropdownColor: widget.dropdownColor ?? Colors.grey.shade100,
+            elevation: widget.elevation ?? 0,
+            isExpanded: widget.isExpanded ?? true,
+            items: [
+              // CREARE LIST ITEMS FROM COUNTRIES DATA
+              ..._countries
+                  .map(
+                    (country) => DropdownMenuItem(
+                      value: country.name,
+                      child: Row(
                         children: [
                           Text(
-                            selectedCountry!.emoji,
+                            country.emoji,
                             style: TextStyle(
-                              fontSize: widget.flagSize ?? 22,
+                              fontSize: widget.listFlagSize ?? 22,
                             ),
                           ),
                           const SizedBox(width: 10),
                           Text(
-                            selectedCountry!.name,
-                            style: widget.hintTextStyle ??
+                            country.name,
+                            style: widget.itemTextStyle ??
                                 const TextStyle(
-                                    color: Colors.black, fontSize: 16),
+                                  color: Colors.black,
+                                  fontSize: 16,
+                                ),
                           ),
                         ],
-                      )
-                    : hintText(
-                        widget.countryHintText ?? 'Choose Country',
-                        style: widget.countryHintStyle,
                       ),
-                dropdownColor: widget.dropdownColor ?? Colors.grey.shade100,
-                elevation: widget.elevation ?? 0,
-                isExpanded: widget.isExpanded ?? true,
-                items: [
-                  // CREARE LIST ITEMS FROM COUNTRIES DATA
-                  ..._countries
-                      .map(
-                        (country) => DropdownMenuItem(
-                          value: country.name,
-                          child: Row(
-                            children: [
-                              Text(
-                                country.emoji,
-                                style: TextStyle(
-                                  fontSize: widget.listFlagSize ?? 22,
-                                ),
-                              ),
-                              const SizedBox(width: 10),
-                              Text(
-                                country.name,
-                                style: widget.itemTextStyle ??
-                                    const TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 16,
-                                    ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      )
-                      .toList(),
-                ],
-                onTap: widget.onCountryTap,
-                onChanged: (value) {
-                  var ct = _countries.firstWhere((c) => c.name == value);
+                    ),
+                  )
+                  .toList(),
+            ],
+            onTap: widget.onCountryTap,
+            onChanged: (value) {
+              var ct = _countries.firstWhere((c) => c.name == value);
 
-                  setState(() {
-                    selectedCountry = ct;
-                    state = null;
-                  });
-                  widget.onCountryChanged(ct.name);
-                }),
-          ),
-        ),
+              setState(() {
+                selectedCountry = ct;
+                state = null;
+              });
+              widget.onCountryChanged(ct.name);
+            }),
 
         /**
          * DIVIDER TO SEPRATE THE TWO FIELDS
@@ -232,72 +182,62 @@ class _CountryStatePickerState extends State<CountryStatePicker> {
 
         //STATE PICKER
 
-        InputDecorator(
-          decoration: widget.inputDecoration ?? _inputDecoration,
-          child: DropdownButtonHideUnderline(
-            child: DropdownButton<String>(
-                hint: state != null
-                    ? Row(
-                        children: [
-                          Text(
-                            state!,
-                            style: widget.hintTextStyle ??
-                                const TextStyle(
-                                    color: Colors.black, fontSize: 16),
-                          ),
-                        ],
-                      )
-                    : selectedCountry != null && selectedCountry!.states.isEmpty
-                        ? Text(widget.noStateFoundText ?? "No States Found")
-                        : hintText(
-                            widget.stateHintText ?? 'Choose State',
-                            style: widget.stateHintStyle,
-                          ),
-                dropdownColor: widget.dropdownColor ?? Colors.grey.shade100,
-                elevation: widget.elevation ?? 0,
-                isExpanded: widget.isExpanded ?? true,
-                items: selectedCountry == null
-                    ? []
-                    : [
-                        // MAP STATES OF SELECTED COUNTRY
-                        ...selectedCountry!.states
-                            .map(
-                              (state) => DropdownMenuItem(
-                                value: state.name,
-                                child: Row(
-                                  children: [
-                                    Text(
-                                      state.name,
-                                      style: widget.itemTextStyle ??
-                                          const TextStyle(
-                                              color: Colors.black,
-                                              fontSize: 16),
-                                    ),
-                                  ],
+        DropdownButtonFormField<String>(
+            validator: widget.stateValidator,
+            decoration: widget.inputDecoration ?? defaultInputDecoration,
+            hint: state != null
+                ? Row(
+                    children: [
+                      Text(
+                        state!,
+                        style: widget.hintTextStyle ??
+                            const TextStyle(color: Colors.black, fontSize: 16),
+                      ),
+                    ],
+                  )
+                : selectedCountry != null && selectedCountry!.states.isEmpty
+                    ? Text(widget.noStateFoundText ?? "No States Found")
+                    : hintText(
+                        widget.stateHintText ?? 'Choose State',
+                        style: widget.hintTextStyle,
+                      ),
+            dropdownColor: widget.dropdownColor ?? Colors.grey.shade100,
+            elevation: widget.elevation ?? 0,
+            isExpanded: widget.isExpanded ?? true,
+            items: selectedCountry == null
+                ? []
+                : [
+                    // MAP STATES OF SELECTED COUNTRY
+                    ...selectedCountry!.states
+                        .map(
+                          (state) => DropdownMenuItem(
+                            value: state.name,
+                            child: Row(
+                              children: [
+                                Text(
+                                  state.name,
+                                  style: widget.itemTextStyle ??
+                                      const TextStyle(
+                                          color: Colors.black, fontSize: 16),
                                 ),
-                              ),
-                            )
-                            .toList(),
-                      ],
-                onTap: widget.onStateTap,
-                onChanged: (value) {
-                  var st = selectedCountry!.states
-                      .firstWhere((e) => e.name == value)
-                      .name;
+                              ],
+                            ),
+                          ),
+                        )
+                        .toList(),
+                  ],
+            onTap: widget.onStateTap,
+            onChanged: (value) {
+              var st = selectedCountry!.states
+                  .firstWhere((e) => e.name == value)
+                  .name;
 
-                  setState(() {
-                    state = st;
-                  });
-                  widget.onStateChanged(st);
-                }),
-          ),
-        ),
+              setState(() {
+                state = st;
+              });
+              widget.onStateChanged(st);
+            }),
       ],
     );
   }
-}
-
-// RETURN A TEXT WIDGET
-Text hintText(String text, {TextStyle? style}) {
-  return Text(text, style: style);
 }

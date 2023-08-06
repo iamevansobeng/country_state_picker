@@ -6,6 +6,7 @@ This package provides drop-down items for selecting countries and states.
 
 - Select Country
 - Select State per selected country
+- Pass validators to validate country and state when submitting form
 
 ##### Parameters
 
@@ -26,6 +27,11 @@ This package provides drop-down items for selecting countries and states.
 | divider          |    ❌    |   --    |      Widget       | Widget to create space or style between the country and state field |
 | countryLabel     |    ❌    |   --    |      Widget       |                       Label for country field                       |
 | stateLabel       |    ❌    |   --    |      Widget       |                        Label for state field                        |
+| countryHintText  |    ❌    |   --    |      String       |                     hintText for country field                      |
+| stateHintText    |    ❌    |   --    |      String       |                      hintText for state field                       |
+| noStateFoundText |    ❌    |   --    |      String       |   Hint to ack no states exist on the selected country (eg. Aruba)   |
+| onCountryChanged |    ❌    |  null   | Function (String) |               Validate Country Selection on Submition               |
+| onStateChanged   |    ❌    |  null   | Function (String) |                Validate State Selection on Submition                |
 
 ### How To Use
 
@@ -50,7 +56,10 @@ This package provides drop-down items for selecting countries and states.
 
 ### Todo
 
-- [x] Create Select Country
+- [x] Select Country
+- [x] Select State
+- [x] Validate Country
+- [x] Validate State
 - [x] Create Select City
 - [ ] Add Select City
 - [ ] Add Variants to the widget
