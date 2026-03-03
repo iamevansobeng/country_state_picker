@@ -10,6 +10,10 @@
 
 - ADDED COMMENTS AND COMPLETE DOCUMENTATION
 
+## 0.0.6
+
+- FIX: Reset state dropdown when country changes to prevent null value error
+
 ## 0.0.5
 
 - HINT TEXT FOR COUNTRY AND STATE (👋 @julianasalafia )

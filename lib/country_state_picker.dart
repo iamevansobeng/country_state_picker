@@ -183,6 +183,8 @@ class _CountryStatePickerState extends State<CountryStatePicker> {
         //STATE PICKER
 
         DropdownButtonFormField<String>(
+            key: ValueKey(selectedCountry?.name),
+            value: state,
             validator: widget.stateValidator,
             decoration: widget.inputDecoration ?? defaultInputDecoration,
             hint: state != null
