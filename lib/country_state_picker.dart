@@ -32,6 +32,11 @@ class CountryStatePicker extends StatefulWidget {
     this.noStateFoundText,
     this.stateValidator,
     this.countryValidator,
+    this.initialCountry,
+    this.initialState,
+    this.showStateField = true,
+    this.enabled = true,
+    this.countryFilter,
   }) : super(key: key);
 
   final ValueChanged<String> onCountryChanged;
@@ -60,40 +65,115 @@ class CountryStatePicker extends StatefulWidget {
   final String? stateHintText;
   final String? noStateFoundText;
 
+  /// Pre-select a country by its name or ISO2 code (e.g. "United States" or "US").
+  final String? initialCountry;
+
+  /// Pre-select a state by its name or state code. Only applied when [initialCountry] is also set.
+  final String? initialState;
+
+  /// Whether to show the state dropdown. Defaults to [true].
+  final bool showStateField;
+
+  /// Whether both dropdowns are interactive. Defaults to [true].
+  final bool enabled;
+
+  /// When provided, only countries whose name or ISO2 code appears in this
+  /// list will be shown. Example: `["US", "CA", "GB"]` or `["United States"]`.
+  final List<String>? countryFilter;
+
   @override
   State<CountryStatePicker> createState() => _CountryStatePickerState();
 }
 
 class _CountryStatePickerState extends State<CountryStatePicker> {
+  // Cache the full country list across all widget instances so the JSON asset
+  // is only decoded once per app session.
+  static List<Country>? _cachedCountries;
+
   List<Country> _countries = [];
-
   Country? selectedCountry;
-
   String? state;
+  bool _initialised = false;
 
-  /// GET COUNTRY AND CITIES FROM JSON
-  Future fetchFile() async {
-    var res = await rootBundle.loadString(
-        'packages/country_state_picker/lib/utils/country-state.json');
-    return jsonDecode(res);
+  /// Loads and decodes the bundled JSON, using the static cache when available.
+  Future<List<Country>> _loadCountries() async {
+    if (_cachedCountries != null) return _cachedCountries!;
+    final raw = await rootBundle.loadString(
+      'packages/country_state_picker/lib/utils/country-state.json',
+    );
+    final list = jsonDecode(raw) as List;
+    _cachedCountries = list.map((ct) => Country.fromJson(ct)).toList();
+    return _cachedCountries!;
   }
 
-  // POPULATE STATE WITH COUNTRIES
-  Future fetchCountries() async {
-    var res = await fetchFile() as List;
-    // ITERATE RESPONSE TO CREATE COUNTRIES AND STATES FOR EACH COUNTRY
-    var data = res.map((ct) => Country.fromJson(ct)).toList();
+  Future<void> _fetchCountries() async {
+    final all = await _loadCountries();
 
+    // Apply optional country filter
+    final filter = widget.countryFilter;
+    final filtered = filter == null || filter.isEmpty
+        ? all
+        : all
+              .where(
+                (c) =>
+                    filter.contains(c.name) ||
+                    filter.contains(c.iso2.toUpperCase()),
+              )
+              .toList();
+
+    Country? initial;
+    String? initialStateName;
+
+    if (!_initialised && widget.initialCountry != null) {
+      final query = widget.initialCountry!;
+      try {
+        initial = filtered.firstWhere(
+          (c) =>
+              c.name.toLowerCase() == query.toLowerCase() ||
+              c.iso2.toLowerCase() == query.toLowerCase(),
+        );
+      } catch (_) {
+        // initialCountry not found — leave unselected
+      }
+
+      if (initial != null && widget.initialState != null) {
+        final stQuery = widget.initialState!;
+        try {
+          initialStateName = initial.states
+              .firstWhere(
+                (s) =>
+                    s.name.toLowerCase() == stQuery.toLowerCase() ||
+                    s.stateCode.toLowerCase() == stQuery.toLowerCase(),
+              )
+              .name;
+        } catch (_) {
+          // initialState not found — leave unselected
+        }
+      }
+
+      _initialised = true;
+    }
+
+    if (!mounted) return;
     setState(() {
-      _countries = data;
+      _countries = filtered;
+      if (initial != null) {
+        selectedCountry = initial;
+        state = initialStateName;
+      }
     });
+
+    // Fire callbacks for pre-selected values so the parent stays in sync
+    if (initial != null) {
+      widget.onCountryChanged(initial.name);
+      if (initialStateName != null) widget.onStateChanged(initialStateName);
+    }
   }
 
   @override
   void initState() {
-    // MAKE SURE COUNTRIES ARE POPULATED BEFORE WIGET IS MOUNTED
-    fetchCountries();
     super.initState();
+    _fetchCountries();
   }
 
   @override
@@ -104,141 +184,127 @@ class _CountryStatePickerState extends State<CountryStatePicker> {
         // LABEL FOR COUNTRY FIELD
         widget.countryLabel ?? const Label(title: "Country"),
 
-        // COUNTRY FIELD
+        // COUNTRY DROPDOWN
         DropdownButtonFormField<String>(
-            validator: widget.countryValidator,
-            decoration: widget.inputDecoration ?? defaultInputDecoration,
-            hint: selectedCountry != null
-                ? Row(
+          validator: widget.countryValidator,
+          decoration: widget.inputDecoration ?? defaultInputDecoration,
+          hint: selectedCountry != null
+              ? Row(
+                  children: [
+                    Text(
+                      selectedCountry!.emoji,
+                      style: TextStyle(fontSize: widget.flagSize ?? 22),
+                    ),
+                    const SizedBox(width: 10),
+                    Text(
+                      selectedCountry!.name,
+                      style:
+                          widget.hintTextStyle ??
+                          const TextStyle(color: Colors.black, fontSize: 16),
+                    ),
+                  ],
+                )
+              : hintText(
+                  widget.countryHintText ?? 'Choose Country',
+                  style: widget.hintTextStyle,
+                ),
+          dropdownColor: widget.dropdownColor ?? Colors.grey.shade100,
+          elevation: widget.elevation ?? 0,
+          isExpanded: widget.isExpanded ?? true,
+          // Passing null to onChanged causes Flutter to render the field as disabled
+          onTap: widget.enabled ? widget.onCountryTap : null,
+          onChanged: widget.enabled
+              ? (value) {
+                  final ct = _countries.firstWhere((c) => c.name == value);
+                  setState(() {
+                    selectedCountry = ct;
+                    state = null;
+                  });
+                  widget.onCountryChanged(ct.name);
+                }
+              : null,
+          items: _countries
+              .map(
+                (country) => DropdownMenuItem(
+                  value: country.name,
+                  child: Row(
                     children: [
                       Text(
-                        selectedCountry!.emoji,
-                        style: TextStyle(
-                          fontSize: widget.flagSize ?? 22,
-                        ),
+                        country.emoji,
+                        style: TextStyle(fontSize: widget.listFlagSize ?? 22),
                       ),
                       const SizedBox(width: 10),
                       Text(
-                        selectedCountry!.name,
-                        style: widget.hintTextStyle ??
+                        country.name,
+                        style:
+                            widget.itemTextStyle ??
                             const TextStyle(color: Colors.black, fontSize: 16),
                       ),
                     ],
-                  )
-                : hintText(
-                    widget.countryHintText ?? 'Choose Country',
-                    style: widget.hintTextStyle,
                   ),
-            dropdownColor: widget.dropdownColor ?? Colors.grey.shade100,
-            elevation: widget.elevation ?? 0,
-            isExpanded: widget.isExpanded ?? true,
-            items: [
-              // CREARE LIST ITEMS FROM COUNTRIES DATA
-              ..._countries
-                  .map(
-                    (country) => DropdownMenuItem(
-                      value: country.name,
-                      child: Row(
-                        children: [
-                          Text(
-                            country.emoji,
-                            style: TextStyle(
-                              fontSize: widget.listFlagSize ?? 22,
-                            ),
-                          ),
-                          const SizedBox(width: 10),
-                          Text(
-                            country.name,
-                            style: widget.itemTextStyle ??
-                                const TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 16,
-                                ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  )
-                  .toList(),
-            ],
-            onTap: widget.onCountryTap,
-            onChanged: (value) {
-              var ct = _countries.firstWhere((c) => c.name == value);
+                ),
+              )
+              .toList(),
+        ),
 
-              setState(() {
-                selectedCountry = ct;
-                state = null;
-              });
-              widget.onCountryChanged(ct.name);
-            }),
+        // DIVIDER BETWEEN THE TWO FIELDS — only shown when state field is visible
+        if (widget.showStateField) widget.divider ?? const SizedBox(height: 10),
 
-        /**
-         * DIVIDER TO SEPRATE THE TWO FIELDS
-         */
-        widget.divider ?? const SizedBox(height: 10),
+        // STATE DROPDOWN — hidden when showStateField is false
+        if (widget.showStateField) ...[
+          widget.stateLabel ?? const Label(title: "State"),
 
-        // LAGE FOR STATE PICKER
-        widget.stateLabel ?? const Label(title: "State"),
-
-        //STATE PICKER
-
-        DropdownButtonFormField<String>(
+          DropdownButtonFormField<String>(
             key: ValueKey(selectedCountry?.name),
             value: state,
             validator: widget.stateValidator,
             decoration: widget.inputDecoration ?? defaultInputDecoration,
             hint: state != null
-                ? Row(
-                    children: [
-                      Text(
-                        state!,
-                        style: widget.hintTextStyle ??
-                            const TextStyle(color: Colors.black, fontSize: 16),
-                      ),
-                    ],
+                ? Text(
+                    state!,
+                    style:
+                        widget.hintTextStyle ??
+                        const TextStyle(color: Colors.black, fontSize: 16),
                   )
                 : selectedCountry != null && selectedCountry!.states.isEmpty
-                    ? Text(widget.noStateFoundText ?? "No States Found")
-                    : hintText(
-                        widget.stateHintText ?? 'Choose State',
-                        style: widget.hintTextStyle,
-                      ),
+                ? Text(widget.noStateFoundText ?? "No States Found")
+                : hintText(
+                    widget.stateHintText ?? 'Choose State',
+                    style: widget.hintTextStyle,
+                  ),
             dropdownColor: widget.dropdownColor ?? Colors.grey.shade100,
             elevation: widget.elevation ?? 0,
             isExpanded: widget.isExpanded ?? true,
+            onTap: widget.enabled ? widget.onStateTap : null,
+            onChanged: widget.enabled && selectedCountry != null
+                ? (value) {
+                    final st = selectedCountry!.states
+                        .firstWhere((e) => e.name == value)
+                        .name;
+                    setState(() => state = st);
+                    widget.onStateChanged(st);
+                  }
+                : null,
             items: selectedCountry == null
                 ? []
-                : [
-                    // MAP STATES OF SELECTED COUNTRY
-                    ...selectedCountry!.states
-                        .map(
-                          (state) => DropdownMenuItem(
-                            value: state.name,
-                            child: Row(
-                              children: [
-                                Text(
-                                  state.name,
-                                  style: widget.itemTextStyle ??
-                                      const TextStyle(
-                                          color: Colors.black, fontSize: 16),
+                : selectedCountry!.states
+                      .map(
+                        (s) => DropdownMenuItem(
+                          value: s.name,
+                          child: Text(
+                            s.name,
+                            style:
+                                widget.itemTextStyle ??
+                                const TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 16,
                                 ),
-                              ],
-                            ),
                           ),
-                        )
-                        .toList(),
-                  ],
-            onTap: widget.onStateTap,
-            onChanged: (value) {
-              var st = selectedCountry!.states
-                  .firstWhere((e) => e.name == value)
-                  .name;
-
-              setState(() {
-                state = st;
-              });
-              widget.onStateChanged(st);
-            }),
+                        ),
+                      )
+                      .toList(),
+          ),
+        ],
       ],
     );
   }
