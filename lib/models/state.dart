@@ -1,12 +1,18 @@
+/// State/region model for a country.
 class State {
-  final String name, stateCode;
+  /// State or region name.
+  final String name;
 
+  /// State code, when available.
+  final String stateCode;
+
+  /// Creates a [State] instance.
   State({
     required this.name,
     required this.stateCode,
   });
 
-  // FROMAT JSON TO DART OBJECT
+  /// Creates a [State] from JSON.
   factory State.fromJson(Map<String, dynamic> json) {
     return State(
       name: json['name'] as String,

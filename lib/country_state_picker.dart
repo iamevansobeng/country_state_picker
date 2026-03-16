@@ -9,7 +9,13 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'components/index.dart';
 import 'utils/index.dart';
 
+/// A form-friendly country and state/region picker widget.
+///
+/// The widget loads country/state data from a bundled JSON asset and renders
+/// searchable dropdown inputs. Use [onCountryChanged] and [onStateChanged] to
+/// receive selected values in your parent widget.
 class CountryStatePicker extends StatefulWidget {
+  /// Creates a [CountryStatePicker].
   const CountryStatePicker({
     Key? key,
     required this.onCountryChanged,
@@ -39,30 +45,64 @@ class CountryStatePicker extends StatefulWidget {
     this.countryFilter,
   }) : super(key: key);
 
+  /// Called when the selected country changes.
   final ValueChanged<String> onCountryChanged;
+
+  /// Called when the selected state/region changes.
   final ValueChanged<String> onStateChanged;
 
+  /// Validator for the country field.
   final ValidatorFunction? countryValidator;
+
+  /// Validator for the state field.
   final ValidatorFunction? stateValidator;
 
+  /// Called when the country dropdown is tapped.
   final VoidCallback? onCountryTap;
+
+  /// Called when the state dropdown is tapped.
   final VoidCallback? onStateTap;
 
+  /// Decoration applied to both dropdown form fields.
   final InputDecoration? inputDecoration;
+
+  /// Emoji flag size for the selected country label.
   final double? flagSize;
+
+  /// Emoji flag size for items in the country dropdown menu.
   final double? listFlagSize;
+
+  /// Text style used by selected/hint text in the fields.
   final TextStyle? hintTextStyle;
+
+  /// Text style used by dropdown menu items.
   final TextStyle? itemTextStyle;
+
+  /// Background color for dropdown menus.
   final Color? dropdownColor;
+
+  /// Elevation used by dropdown menus.
   final int? elevation;
+
+  /// Whether dropdowns should expand to fill available width.
   final bool? isExpanded;
 
+  /// Widget placed between the country and state fields.
   final Widget? divider;
+
+  /// Widget rendered above the country field.
   final Widget? countryLabel;
+
+  /// Widget rendered above the state field.
   final Widget? stateLabel;
 
+  /// Hint text for the country field.
   final String? countryHintText;
+
+  /// Hint text for the state field.
   final String? stateHintText;
+
+  /// Text shown when a selected country has no states.
   final String? noStateFoundText;
 
   /// Pre-select a country by its name or ISO2 code (e.g. "United States" or "US").
@@ -256,7 +296,7 @@ class _CountryStatePickerState extends State<CountryStatePicker> {
 
           DropdownButtonFormField<String>(
             key: ValueKey(selectedCountry?.name),
-            value: state,
+            initialValue: state,
             validator: widget.stateValidator,
             decoration: widget.inputDecoration ?? defaultInputDecoration,
             hint: state != null

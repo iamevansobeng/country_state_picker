@@ -1,19 +1,42 @@
 import 'package:country_state_picker/models/state.dart';
 
+/// Country model used by [CountryStatePicker].
 class Country {
-  final String name,
-      iso2,
-      iso3,
-      phoneCode,
-      currencyName,
-      currencySymbol,
-      tld,
-      region,
-      // subRegion,
-      emoji,
-      emojiU;
+  /// Country display name, e.g. "Ghana".
+  final String name;
+
+  /// ISO-3166 alpha-2 code, e.g. "GH".
+  final String iso2;
+
+  /// ISO-3166 alpha-3 code, e.g. "GHA".
+  final String iso3;
+
+  /// International phone code, e.g. "233".
+  final String phoneCode;
+
+  /// Currency name, e.g. "Ghanaian cedi".
+  final String currencyName;
+
+  /// Currency symbol, e.g. "GH₵".
+  final String currencySymbol;
+
+  /// Top-level domain, e.g. ".gh".
+  final String tld;
+
+  /// Region name, e.g. "Africa".
+  final String region;
+  // subRegion,
+
+  /// Country flag emoji.
+  final String emoji;
+
+  /// Unicode sequence for the flag emoji.
+  final String emojiU;
+
+  /// List of states/regions for this country.
   final List<State> states;
 
+  /// Creates a [Country] instance.
   Country({
     required this.states,
     required this.name,
@@ -28,10 +51,10 @@ class Country {
     required this.emojiU,
   });
 
-  // FORMAT JSON TO DART OBJECT
+  /// Creates a [Country] from JSON.
   factory Country.fromJson(Map<String, dynamic> json) {
     var states = <State>[];
-    // ITERATE OVER JSON TO CREATE STATES FOR THE COUNTRY
+    // Iterate over JSON to create states for the country.
     json["states"].forEach((st) => states.add(State.fromJson(st)));
     return Country(
       states: states,

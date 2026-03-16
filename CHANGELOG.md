@@ -1,3 +1,8 @@
+## 0.1.2
+
+- DOCS: added dartdoc comments across public API (widgets, models, and helpers)
+- FIX: replaced deprecated `DropdownButtonFormField.value` with `initialValue`
+
 ## 0.1.1
 
 - DOCS: removed internal screenshot note from README

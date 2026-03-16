@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-/// DEFAULT INPUT DECORATION
-InputDecoration defaultInputDecoration = InputDecoration(
+/// Default input decoration used by both dropdown form fields.
+final InputDecoration defaultInputDecoration = InputDecoration(
   prefixStyle: const TextStyle(color: Colors.blueGrey),
   focusColor: Colors.blueGrey,
   iconColor: Colors.blueGrey,
@@ -30,5 +30,5 @@ InputDecoration defaultInputDecoration = InputDecoration(
   border: InputBorder.none,
 );
 
-// TYPEDEF FOR VALIDATOR
+/// Validator signature used by country and state form fields.
 typedef ValidatorFunction = String Function(String? value);

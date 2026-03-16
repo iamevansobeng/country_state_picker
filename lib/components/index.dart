@@ -2,12 +2,15 @@
 //  NOT WORTH CREATING A SEPARATE FILE FOR EACH COMPONENT
 import 'package:flutter/material.dart';
 
+/// Lightweight label widget used above dropdown fields.
 class Label extends StatelessWidget {
+  /// Creates a [Label].
   const Label({
     Key? key,
     required this.title,
   }) : super(key: key);
 
+  /// Label text.
   final String title;
 
   @override
@@ -23,7 +26,7 @@ class Label extends StatelessWidget {
   }
 }
 
-// RETURN A TEXT WIDGET
+/// Returns a [Text] widget for hint content.
 Text hintText(String text, {TextStyle? style}) {
   return Text(text, style: style);
 }
