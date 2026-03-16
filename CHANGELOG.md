@@ -1,3 +1,9 @@
+## 0.1.1
+
+- DOCS: removed internal screenshot note from README
+- DOCS: switched screenshot links to absolute GitHub raw URLs for reliable pub.dev rendering
+- META: improved package description wording in `pubspec.yaml`
+
 ## 0.1.0
 
 - NEW: `initialCountry` — pre-select a country by name or ISO2 code on mount

@@ -1,6 +1,6 @@
 ### Description
 
-A Flutter package for selecting countries and their states/regions from searchable dropdown fields. Compatible with iOS, Android, and Web.
+A Flutter package that lets users select a country and state/region using searchable dropdowns. Supports iOS, Android, and Web.
 
 ---
 
@@ -8,9 +8,7 @@ A Flutter package for selecting countries and their states/regions from searchab
 
 |              Basic              |                 Pre-selected                  |                 Country Only                  |               Filtered                |
 | :-----------------------------: | :-------------------------------------------: | :-------------------------------------------: | :-----------------------------------: |
-| ![Basic](screenshots/basic.png) | ![Pre-selected](screenshots/pre_selected.png) | ![Country Only](screenshots/country_only.png) | ![Filtered](screenshots/filtered.png) |
-
-> Take screenshots of each example tab and save them to a `screenshots/` folder at the project root.
+| ![Basic](https://raw.githubusercontent.com/iamevansobeng/country_state_picker/stable/screenshots/basic.png) | ![Pre-selected](https://raw.githubusercontent.com/iamevansobeng/country_state_picker/stable/screenshots/pre_selected.png) | ![Country Only](https://raw.githubusercontent.com/iamevansobeng/country_state_picker/stable/screenshots/country_only.png) | ![Filtered](https://raw.githubusercontent.com/iamevansobeng/country_state_picker/stable/screenshots/filtered.png) |
 
 ---
 
